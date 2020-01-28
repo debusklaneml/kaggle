@@ -1,5 +1,11 @@
 # Titanic - 1/20/2020 - M. L. DeBusk-Lane
-?
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(tune)
+library(janitor)
+library(readxl)
+library(tidylog)
 
 # read in training dataset
 train <- read_csv("train.csv") %>% clean_names() %>%
@@ -17,10 +23,11 @@ test <- read_csv("test.csv") %>% clean_names() %>%
 # data prep (recipe)
 titanic_recipe <- train %>%
   recipe(survived ~ pclass + age + sib_sp + parch + fare + embarked) %>%
-  step_dummy(embarked) %>% 
-  step_corr(all_predictors()) %>%
-  step_center(all_predictors(), -all_outcomes()) %>%
-  step_scale(all_predictors(), -all_outcomes()) %>%
+  step_dummy(embarked) %>%
+  step_normalize(age, fare) %>%
+  #step_corr(all_predictors()) %>%
+  #step_center(all_predictors(), -all_outcomes()) %>%
+  #step_scale(all_predictors(), -all_outcomes()) %>%
   step_bagimpute(age, fare, embarked_Q, embarked_S) %>%
   prep() 
 
